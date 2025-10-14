@@ -11,6 +11,16 @@ diesel::table! {
 }
 
 diesel::table! {
+    keyword_specialtys (uuid) {
+        uuid -> Binary,
+        created_at -> Timestamp,
+        updated_at -> Nullable<Timestamp>,
+        keyword_uuid -> Binary,
+        specialty_uuid -> Binary,
+    }
+}
+
+diesel::table! {
     keywords (uuid) {
         uuid -> Binary,
         created_at -> Timestamp,
@@ -64,12 +74,15 @@ diesel::table! {
 
 diesel::joinable!(keyword_nafs -> keywords (keyword_uuid));
 diesel::joinable!(keyword_nafs -> nafs (naf_uuid));
+diesel::joinable!(keyword_specialtys -> keywords (keyword_uuid));
+diesel::joinable!(keyword_specialtys -> specialtys (specialty_uuid));
 diesel::joinable!(rome_nafs -> nafs (naf_uuid));
 diesel::joinable!(rome_nafs -> romes (rome_uuid));
 diesel::joinable!(specialtys -> nafs (naf_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
     keyword_nafs,
+    keyword_specialtys,
     keywords,
     nafs,
     rome_nafs,

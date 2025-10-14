@@ -81,7 +81,7 @@ pub fn insert_specialty(connection: Connection, request: Json<NewSpecialtyReques
         uuid: &new_uuid.as_bytes().to_vec(),
         created_at: &chrono::Local::now().naive_utc(),
         updated_at: None,
-        label: &request.label,
+        label: &request.label.to_uppercase(),
         description: _description,
         naf_id: &naf_id.as_bytes().to_vec()
     };
@@ -115,9 +115,9 @@ pub fn update_specialty_by_id(id: String, specialty: Json<NewSpecialtyRequest>, 
         .find(&_id.as_bytes().to_vec()))
         .set(_updated_specialty)
         .execute(&*connection) {
-            Ok(_) => Ok(Accepted::<Json<SuccessRessource>>(Some(Json(
+            Ok(_) => Ok(Accepted::<Json<SuccessRessource>>(Json(
                 SuccessRessource { success: true },
-            )))),
+            ))),
             Err(_) => Err(ServerError("Unable to update the specialty".to_string())),
         }
 }

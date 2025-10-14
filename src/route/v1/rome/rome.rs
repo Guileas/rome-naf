@@ -223,9 +223,9 @@ pub fn update_rome_by_id(id: String, rome: Json<NewRomeRequest>,  connection: Co
         .find(&_id.as_bytes().to_vec()))
         .set(_rome)
         .execute(&*connection) {
-            Ok(_) => Ok(Accepted::<Json<SuccessRessource>>(Some(Json(
+            Ok(_) => Ok(Accepted::<Json<SuccessRessource>>(Json(
                 SuccessRessource { success: true },
-            )))),
+            ))),
             Err(_) => Err(ServerError("Unable to update the rome".to_string())),
         }
 }

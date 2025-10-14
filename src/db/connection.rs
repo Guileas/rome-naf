@@ -33,7 +33,7 @@ impl<'r> FromRequest<'r> for Connection {
         let pool = try_outcome!(request.guard::<&State<MysqlPool>>().await);
         match pool.get() {
             Ok(conn) => Outcome::Success(Connection(conn)),
-            Err(_) => Outcome::Failure((Status::ServiceUnavailable, ())),
+            Err(_) => Outcome::Error((Status::ServiceUnavailable, ())),
         }
     }
 }

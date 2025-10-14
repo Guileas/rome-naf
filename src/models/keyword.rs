@@ -1,5 +1,7 @@
 use chrono::NaiveDateTime;
+use serde::Serialize;
 use crate::db::schema::keywords;
+use rocket_okapi::JsonSchema;
 
 #[derive(AsChangeset, Queryable, Identifiable)]
 #[primary_key(uuid)]

@@ -153,6 +153,37 @@ pub fn autocomplete_keyword_search(
 }
 
 #[openapi(tag = "Keyword", ignore = "connection")]
+#[get("/v1/autocomplete/keyword/<search_term>")]
+pub fn autocomplete_search(search_term: String, connection: Connection) -> Json<Vec<KeywordResource>> {
+    use crate::models::keyword::Keyword;
+
+    let matching_keywords: Vec<Keyword> = keywords::table
+        .filter(keywords::label.like(format!("{}%", search_term)))
+        .load(&*connection)
+        .expect("Could not load nafs")
+        .into_iter()
+        .take(10)
+        .collect();
+
+    let mut _keyword = Vec::new();
+    let default_uuid: Uuid = Uuid::parse_str("00000000000000000000000000000000").unwrap();
+
+    for keyword in matching_keywords {
+        let _uuid = match Uuid::from_slice(keyword.uuid.as_slice()) {
+            Ok(_uuid) => _uuid,
+            Err(_err) => default_uuid,
+        };
+
+        _keyword.push(KeywordResource {
+            uuid: _uuid.to_string(),
+            label: keyword.label.to_string(),
+        })
+    }
+
+    Json(_keyword)
+}
+
+#[openapi(tag = "Keyword", ignore = "connection")]
 #[get("/v1/keyword/<id>")]
 pub fn get_keyword_by_id(connection: Connection, id: String) -> Json<Vec<KeywordResource>> {
     let _id = Uuid::parse_str(&id).unwrap();
@@ -216,12 +247,15 @@ pub fn get_nafs_by_keyword(connection: Connection, id: String) -> Json<Vec<NafRe
 }
 
 #[openapi(tag = "Keyword", ignore = "_conn")]
-#[post("/v1/keyword_nafs/delete", format = "application/json", data = "<request>")]
+#[post(
+    "/v1/keyword_nafs/delete",
+    format = "application/json",
+    data = "<request>"
+)]
 pub fn delete_specialty_by_id(
     _conn: Connection,
     request: Json<NewKeywordNafsRequest>,
 ) -> Json<SuccessRessource> {
-
     let _naf_id = Uuid::parse_str(&request.nafId).unwrap();
 
     let _keyword_uuid = Uuid::parse_str(&request.keywordId).unwrap();
@@ -339,9 +373,9 @@ pub fn update_keyword_by_id(
         .set(_keyword)
         .execute(&*connection)
     {
-        Ok(_) => Ok(Accepted::<Json<SuccessRessource>>(Some(Json(
+        Ok(_) => Ok(Accepted::<Json<SuccessRessource>>(Json(
             SuccessRessource { success: true },
-        )))),
+        ))),
         Err(_) => Err(ServerError("Unable to update the keyword".to_string())),
     }
 }
