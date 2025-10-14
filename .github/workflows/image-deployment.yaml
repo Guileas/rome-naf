@@ -28,7 +28,7 @@ jobs:
               run: |
                   VERSION=${GITHUB_REF#refs/tags/}
                   SHORT_SHA=$(git rev-parse --short HEAD)
-                  IMAGE_NAME="ghcr.io/$(echo "$GITHUB_REPOSITORY" | tr '[:upper:]' '[:lower:]'"
+                  IMAGE_NAME="ghcr.io/$(echo "$GITHUB_REPOSITORY" | tr '[:upper:]' '[:lower:]')"
 
                   echo "version=$VERSION" >> $GITHUB_OUTPUT
                   echo "sha=$SHORT_SHA" >> $GITHUB_OUTPUT
