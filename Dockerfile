@@ -31,4 +31,4 @@ USER appuser
 
 EXPOSE 80
 
-CMD ["./main"]
+ENTRYPOINT ["./main"]
