@@ -29,8 +29,8 @@ fn index() -> &'static str {
 }
 
 pub fn build_rocket() -> Rocket<Build> {
-    let mut rocket = rocket::build()
-    .manage(connect());
+    let mut rocket = rocket::build();
+    //.manage(connect());
 
     #[cfg(debug_assertions)]
     {
