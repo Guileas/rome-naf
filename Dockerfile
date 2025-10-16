@@ -5,6 +5,7 @@ RUN apt-get update && apt-get install -y bash curl musl-dev musl openssl default
 WORKDIR /build
 
 COPY Cargo.toml ./
+COPY Cargo.lock ./
 
 RUN mkdir src && echo "fn main() {}" > src/main.rs
 
