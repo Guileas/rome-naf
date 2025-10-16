@@ -1,6 +1,6 @@
 FROM rust:1.90.0-slim  AS builder
 
-RUN apt-get update && apt-get install -y bash curl musl-dev musl openssl default-libmysqlclient-dev
+RUN apt-get update && apt-get install -y bash curl openssl default-libmysqlclient-dev
 
 WORKDIR /build
 
@@ -27,8 +27,13 @@ RUN apt-get update && \
 RUN useradd -m appuser
 WORKDIR /main
 COPY --from=builder /build/target/release/rome_naf ./main
+COPY --from=builder /build/Rocket.toml ./Rocket.toml
+
 RUN chmod +x ./main && chown appuser:appuser ./main
 USER appuser
+
+ENV ROCKET_ADDRESS=0.0.0.0
+ENV ROCKET_PORT=80
 
 EXPOSE 80
 
