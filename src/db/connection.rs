@@ -13,11 +13,19 @@ pub type MysqlPool = Pool<ConnectionManager<MysqlConnection>>;
 
 pub fn  connect() -> MysqlPool {
     dotenv().ok();
-    let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
-    let manager = ConnectionManager::<MysqlConnection>::new(database_url);
-    Pool::builder()
-        .build(manager)
-        .expect("Failed to create pool")
+    match env::var("DATABASE_URL") {
+        Ok(database_url) => {
+            let manager = ConnectionManager::<MysqlConnection>::new(database_url);
+            Pool::builder()
+                .build(manager)
+                .expect("Failed to create pool")
+        }
+        Err(_) => {
+            eprintln!("DATABASE_URL is not set");
+            std::process::exit(1);
+        }
+    }
+
 }
 
 pub struct Connection(pub PooledConnection<ConnectionManager<MysqlConnection>>);

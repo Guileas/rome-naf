@@ -20,6 +20,7 @@ use rocket_okapi::{openapi_get_routes, swagger_ui::*, OpenApiError};
 
 use db::connection::connect;
 use fairing::cors::CORS;
+use std::io::{stdout, Write};
 
 #[openapi]
 #[get("/")]
@@ -124,6 +125,7 @@ pub fn build_rocket() -> Rocket<Build> {
 #[launch]
 fn rocket() -> _ {
     println!("Starting app...");
+    std::io::stdout().flush().unwrap();
     build_rocket()
 }
 
