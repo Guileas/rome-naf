@@ -1,21 +1,18 @@
 FROM rust:1.90.0-slim  AS builder
 
+ARG pkg=rome_naf
+
+
 RUN apt-get update && apt-get install -y bash curl openssl default-libmysqlclient-dev
 
 WORKDIR /build
 
-COPY Cargo.toml ./
-COPY Cargo.lock ./
-
-RUN mkdir src && echo "fn main() {}" > src/main.rs
-
-RUN cargo build --release
-
-RUN rm -rf src
-
 COPY . .
 
-RUN cargo build --release
+RUN --mount=type=cache,target=/build/target \
+    --mount=type=cache,target=/usr/local/cargo/registry \
+    --mount=type=cache,target=/usr/local/cargo/git \
+    cargo build --release;
 
 # ---- STAGE 2: Runtime ----
 FROM debian:bookworm-slim AS runtime
@@ -26,15 +23,15 @@ RUN apt-get update && \
 
 RUN useradd -m appuser
 WORKDIR /main
-COPY --from=builder /build/target/release/rome_naf ./main
+COPY --from=builder /build/target/release/$pkg ./main
 COPY --from=builder /build/Rocket.toml ./Rocket.toml
 
 RUN chmod +x ./main && chown appuser:appuser ./main
 USER appuser
 
 ENV ROCKET_ADDRESS=0.0.0.0
-ENV ROCKET_PORT=80
+ENV ROCKET_PORT=8000
 
-EXPOSE 80
+EXPOSE 8000
 
 ENTRYPOINT ["./main"]
