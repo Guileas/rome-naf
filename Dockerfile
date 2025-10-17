@@ -10,6 +10,8 @@ RUN --mount=type=cache,target=/build/target \
     --mount=type=cache,target=/usr/local/cargo/registry \
     --mount=type=cache,target=/usr/local/cargo/git \
     cargo build --release;
+    cp /build/target/release/rome_naf /build/rome_naf \
+    cp /build/Rocket.toml /build
 
 # ---- STAGE 2: Runtime ----
 FROM debian:bookworm-slim AS runtime
@@ -20,7 +22,7 @@ RUN apt-get update && \
 
 RUN useradd -m appuser
 WORKDIR /main
-COPY --from=builder /build/target/release/rome_naf ./main
+COPY --from=builder /build/rome_naf ./main
 COPY --from=builder /build/Rocket.toml ./Rocket.toml
 
 RUN chmod +x ./main && chown appuser:appuser ./main
