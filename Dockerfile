@@ -1,8 +1,5 @@
 FROM rust:1.90.0-slim  AS builder
 
-ARG pkg=rome_naf
-
-
 RUN apt-get update && apt-get install -y bash curl openssl default-libmysqlclient-dev
 
 WORKDIR /build
@@ -23,7 +20,7 @@ RUN apt-get update && \
 
 RUN useradd -m appuser
 WORKDIR /main
-COPY --from=builder /build/target/release/$pkg ./main
+COPY --from=builder /build/target/release/rome_naf ./main
 COPY --from=builder /build/Rocket.toml ./Rocket.toml
 
 RUN chmod +x ./main && chown appuser:appuser ./main
